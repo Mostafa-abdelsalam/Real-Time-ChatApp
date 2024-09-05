@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const userRoutes = require('./routes/userRoutes');
 const passport = require('passport');
+const i18n = require('./i18n');
 const session = require('express-session');
 const passportConfig = require('./config/passportConfig');
 const http = require('http');
@@ -47,8 +48,18 @@ app.use('/api/users', userRoutes);
 
 app.use(express.static('public'));
 
+app.use((req, res, next) => {
+  req.i18n = i18n;
+  next();
+});
+
+app.use((req, res, next) => {
+  req.t = i18n.getFixedT(req.language || 'en');
+  next();
+});
+
 app.get('/', (req, res) => {
-    res.send('Real-Time Chat App is running... ');
+  res.send(req.t('welcome'));
 });
 
 io.on('connection', (socket) => {
